@@ -60,7 +60,7 @@ auto main(int argc, char **argv) -> int {
 
   CLI11_PARSE(app, argc, argv);
 
-  constexpr std::size_t const ByteCount = 128 / 8;
+  constexpr std::size_t const ByteCount = 16;
   rankcpp::simulateCPA<ByteCount>(traceCount, snr, rngSeed, filepath,
                                   keyFilepath);
 

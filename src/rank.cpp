@@ -60,7 +60,7 @@ auto main(int argc, char **argv) -> int {
 
   CLI11_PARSE(app, argc, argv);
 
-  constexpr std::size_t const ByteCount = 128 / 8;
+  constexpr std::size_t const ByteCount = 16;
   constexpr std::size_t const KeyLenBits = ByteCount * 8;
   rankcpp::Dimensions dimensions(ByteCount, 8);
   rankcpp::estimateRank<KeyLenBits>(dimensions, precision, filepath,
