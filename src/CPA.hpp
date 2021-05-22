@@ -15,9 +15,10 @@
 
 namespace rankcpp {
 
+template <std::size_t ByteCount = 16>
 class SimulatedHWCPA {
 public:
-  SimulatedHWCPA(std::array<uint8_t, 16> key, std::size_t traceCount,
+  SimulatedHWCPA(std::array<uint8_t, ByteCount> key, std::size_t traceCount,
                  double snr, std::uint64_t rngSeed)
       : key_(key), traceCount_(traceCount), generator(rngSeed),
         normalDistribution(0.0, std::sqrt(2.0 / snr)),
@@ -25,15 +26,15 @@ public:
 
   ScoresTable<double> nextRandomAttack() {
     // Generate next random plaintexts
-    std::vector<uint8_t> allPlaintextBytes(traceCount_ * 16);
+    std::vector<uint8_t> allPlaintextBytes(traceCount_ * ByteCount);
     std::generate(allPlaintextBytes.begin(), allPlaintextBytes.end(),
                   [&] { return uniformDistribution(generator); });
 
     // Generate next trace values
-    // traces_for_byte_0||traces_for_byte_1||...||traces_for_byte_15
-    std::vector<double> allTraceSamples(traceCount_ * 16);
-    for (uint32_t byteIndex = 0; byteIndex < 16; byteIndex++) {
-      for (uint32_t traceIndex = 0; traceIndex < traceCount_; traceIndex++) {
+    // traces_for_byte_0||traces_for_byte_1||...
+    std::vector<double> allTraceSamples(traceCount_ * ByteCount);
+    for (std::size_t byteIndex = 0; byteIndex < ByteCount; byteIndex++) {
+      for (std::size_t traceIndex = 0; traceIndex < traceCount_; traceIndex++) {
         uint8_t const plaintextByte =
             allPlaintextBytes[byteIndex * traceCount_ + traceIndex];
         uint8_t const intermediateValue = sBox(plaintextByte ^ key_[byteIndex]);
@@ -44,13 +45,13 @@ public:
     }
 
     // Prepare distinguishing table scores
-    Dimensions const dims(16, 8);
+    Dimensions const dims(ByteCount, 8);
     ScoresTable<double> scores(dims);
-    for (uint32_t byteIndex = 0; byteIndex < 16; byteIndex++) {
+    for (std::size_t byteIndex = 0; byteIndex < ByteCount; byteIndex++) {
       std::array<double, 256> corrs;
-      for (uint32_t subkey = 0; subkey < 256; subkey++) {
+      for (std::size_t subkey = 0; subkey < 256; subkey++) {
         std::vector<double> hypValues(traceCount_);
-        for (uint32_t traceIndex = 0; traceIndex < traceCount_; traceIndex++) {
+        for (std::size_t traceIndex = 0; traceIndex < traceCount_; traceIndex++) {
           uint8_t const plaintextByte =
               allPlaintextBytes[byteIndex * traceCount_ + traceIndex];
           uint64_t const intermediateValue =
@@ -72,7 +73,7 @@ public:
   }
 
 private:
-  std::array<uint8_t, 16> const key_;
+  std::array<uint8_t, ByteCount> const key_;
   uint64_t const traceCount_;
   std::mt19937 generator;
   std::normal_distribution<double> normalDistribution;
@@ -103,8 +104,8 @@ private:
     return rNumerator / rDenominator;
   }
 
-  double hammingWeight(uint64_t value) {
-    uint64_t hw = value;
+  double hammingWeight(std::uint64_t value) {
+    std::uint64_t hw = value;
     hw -= (hw >> 1) & 0x5555555555555555;
     hw = (hw & 0x3333333333333333) + ((hw >> 2) & 0x3333333333333333);
     hw = (hw + (hw >> 4)) & 0x0f0f0f0f0f0f0f0f;
