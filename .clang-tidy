@@ -1,0 +1,5 @@
+---
+Checks:          '*,-fuchsia-*,-google-*,-zircon-*,-abseil-*,modernize*,-modernize-use-nodiscard,-llvm-*'
+WarningsAsErrors: '*'
+HeaderFilterRegex: ''
+FormatStyle:     none
