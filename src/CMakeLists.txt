@@ -14,6 +14,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(CLI11)
 
+# Boost
+find_package(Boost 1.67.0)
+
 # Run a key rank algorithm
 add_executable(rank
     "${CMAKE_CURRENT_SOURCE_DIR}/rank.cpp"
@@ -24,6 +27,7 @@ app_options
   rankcpp
   CLI11
 )
+target_include_directories(rank PRIVATE ${Boost_INCLUDE_DIRS})
 target_compile_features(rank PUBLIC cxx_std_17)
 target_compile_options(rank PUBLIC -funroll-loops)
 set_target_properties(rank PROPERTIES CXX_EXTENSIONS OFF)

@@ -2,7 +2,9 @@
 
 ## Build
 
-You need to have Boost headers available on your system path.
+__Note__: you need to have Boost _headers_ available on your system path.  On
+Linux, installation from a package manager will suffice.  On macOS it is
+simplest to use Homebrew: `brew install boost`.
 
 ```shell
 mkdir build
